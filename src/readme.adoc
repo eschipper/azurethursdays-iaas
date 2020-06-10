@@ -13,7 +13,7 @@ Apart from that, I have the following items installed:
 * Azure Resource Manager (ARM) Tools Extension for Visual Studio Code. This is useful for Intellisense and syntax highlighting. You can install those from the extensions menu.
 * Azure Powershell Cmdlets. You can install the commandlets in powershell with this command: `Install-Module -Name Az -AllowClobber -Scope CurrentUser`
 
-== ARM Templates
+== Part 1: ARM Templates
 === My first ARM template
 We're going to deploy some ARM templates. We'll have to connect to azure.
 
@@ -396,7 +396,8 @@ To do that, find the `securityRules` section and add an extra rule next to the e
 ----
 
 Now, deploy the template again.
-IIS will be installed, and when you browse it, a simple message will appear.
+IIS will be installed. 
+When it is finished, open a browser and visit the url.
 
 In this example, we've used inline statements in the commandToExecute. It is also possible to specify a file from a repository to be executed. 
 
@@ -416,11 +417,11 @@ First, we'll add a tags parameter, with some obscure default values:
         }
     }
 ----
-and for the each resource we'll use that property with the following line (so it is added ):
+and for the each resource we'll use that property with the following line (so it is added for each resource):
 
 "tags": "[parameters('deploymentTags')]",
 
-Create a file named azurethursdaywebsite.parameters.dev.json with the following content:
+Create a file named azurethursdaywebsite.parameters.dev.json with the following content: (Dont forget to fill in the unique name for dnsLabelPrefix, which you provided earlier)
 
 [source, json]
 ----
@@ -432,7 +433,7 @@ Create a file named azurethursdaywebsite.parameters.dev.json with the following 
         "value": "azthuradmin"
       },
       "dnsLabelPrefix": {
-        "value": "mustbeuniquewutwut"
+        "value": "youruniquename"
       },
       "windowsOSVersion": {
         "value": "2016-Datacenter"
@@ -452,6 +453,8 @@ Create a file named azurethursdaywebsite.parameters.dev.json with the following 
 
 Run the following Powershell command:
 
+[source, powershell]
+----
 $templateFile = "azurethursday.json"
 $securePassword = convertto-securestring "azthurP@ssw0rd123!" -asplaintext -force
 $parameterFile = "azurethursdaywebsite.parameters.dev.json"
@@ -460,15 +463,15 @@ New-AzResourceGroupDeployment `
   -ResourceGroupName armResourceGroup `
   -TemplateFile $templateFile `
   -TemplateParameterFile $parameterFile `
-  -adminPassword $securePassword `
-
+  -adminPassword $securePassword 
+----
 
 In Azure Portal, navigate to your VM (SimpleWinVM) and verify that the tags are present. 
 Now click on one of the two tags. It should bring you to a list of all resources with that tag, which can be convenient.
 
 image::../images/verifydeployment5.PNG[]
 
-== Docker containers in Azure
+== Part 2: Docker containers in Azure
 
 === Create an ACR 
 We will be using the azure CLI for these steps.
@@ -492,7 +495,7 @@ Note that we're creating a Premium registry here. It's a bit more expensive, but
 The following command will create a geo-replication in east asia:
 
 ----
-az acr replication create -r acrazthur -l eastasia
+az acr replication create -r youruniquename -l eastasia
 ----
 
 When this is finished, visit the azure portal and navigate to container registries. Choose the registry you just created and click on 'Replications'. Verify that the replication is set up correctly:
