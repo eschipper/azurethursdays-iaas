@@ -129,7 +129,7 @@ Now deploy the template again, using the same command as before:
 ----
 $templateFile = "azurethursday.json"
 New-AzResourceGroupDeployment `
-  -Name blanktemplate `
+  -Name withstorageaccount `
   -ResourceGroupName armResourceGroup `
   -TemplateFile $templateFile
 
@@ -137,7 +137,7 @@ New-AzResourceGroupDeployment `
 
 Again, watch for an output similar to this:
 ....
-DeploymentName          : blanktemplate
+DeploymentName          : withstorageaccount
 ResourceGroupName       : armResourceGroup
 ProvisioningState       : Succeeded
 Timestamp               : 6/6/2020 11:05:19 PM
@@ -196,6 +196,8 @@ Note that you can give a default value if you want. But to show how it's done, s
 In this example, the parameter `namePrefix` is of type string. It is possible to put constraints to these (`minLength`, `maxLength`, `allowedValues` for enumeration-like behaviour). Other datatypes are `securestring`, `int`, `bool`, `object`, `secureObject` and `array`.
 
 We also added an outputs property. This gives info on the created resource. Note the 'reference' function. It gets the object with the specified name.
+
+Deploy the template again:
 
 [source, powershell]
 ----
@@ -298,9 +300,11 @@ Also note that this template has some parameters we that can be passed:
 * vmSize (default : Standard_D2_v3)
 * location (default : same as storage account)
 
+For the URL, a unique name must be specified
 
 [source, powershell]
 ----
+$dnsLabelPrefix = "youruniquename"
 $templateFile = "azurethursday.json"
 $securePassword = convertto-securestring "azthurP@ssw0rd123!" -asplaintext -force
 New-AzResourceGroupDeployment `
@@ -309,7 +313,7 @@ New-AzResourceGroupDeployment `
   -TemplateFile $templateFile `
   -adminUsername "azthuradmin" `
   -adminPassword $securePassword `
-  -dnsLabelPrefix "mustbeuniquewutwut" 
+  -dnsLabelPrefix $dnsLabelPrefix
 ----
 
 Output should be like:
@@ -324,7 +328,7 @@ Parameters              :
                           Name                Type                       Value
                           ==================  =========================  ==========
                           adminPassword       SecureString
-                          dnsLabelPrefix      String                     mustbeuniquewutwut
+                          dnsLabelPrefix      String                     youruniquename
                           windowsOSVersion    String                     2016-Datacenter
                           vmSize              String                     Standard_D2_v3
                           location            String                     westeurope
@@ -332,7 +336,7 @@ Parameters              :
 Outputs                 :
                           Name             Type                       Value
                           ===============  =========================  ==========
-                          hostname         String                     mustbeuniquewutwut.westeurope.cloudapp.azure.com
+                          hostname         String                     youruniquename.westeurope.cloudapp.azure.com
 
 DeploymentDebugLogLevel :
 ....
@@ -341,12 +345,12 @@ In the Azure portal, you could verify the deployment:
 
 image::../images/verifydeployment4.PNG[]
 
-By now, it should be possible now to connect to the VM using the credentials specified earlier to the template. In order to do that, you'll need to open a remote desktop connection to the hostname specified by the output of the last command. (in the example it is: mustbeuniquewutwut.westeurope.cloudapp.azure.com )
+By now, it should be possible now to connect to the VM using the credentials specified earlier to the template. In order to do that, you'll need to open a remote desktop connection to the hostname specified by the output of the last command. (in the example it is: youruniquename.westeurope.cloudapp.azure.com )
 
 Note: it's perfectly safe to execute the command one more time. Nothing will happen actually, because the resource with the name specified already exists and it has the same specs. You can think of it as a 'create or update' command. It will, however, update the 'last modified column' in the deployments section, even though nothing happened.
 
-=== Installing extensions
-So now we have deployed a virtual machine and its dependencies. In this section we will try to install some other stuff along with it.
+=== Installing extensions on the virtual machine
+So now we have deployed a virtual machine and its dependencies. In this section we will install the IIS extension on the virtual machine. For the non-microsoft people, IIS stands for Internet Information Services, and is the standard web server of Microsoft. We will also set up a static 'homepage'.
 
 in the template, add the following resource:
 
@@ -480,7 +484,7 @@ az group create -n rg-acr-azthur -l westeurope
 
 Now create the ACR (you'll have to invent a unique name yourself. alphanumeric between 5-50):
 ----
-REGISTRY_NAME=youruniquename
+$REGISTRY_NAME=youruniquename
 az acr create -n $REGISTRY_NAME -g rg-acr-azthur -l westeurope --sku Premium
 ----
 
@@ -516,7 +520,7 @@ Press ctrl-s, and name the file Dockerfile
 This file will be saved on a drive which is attached to your azure cli environment. It's made the first time you enter a cli session. A separate resource group and storage account are made automatically.
 Of course this is not meant as a production drive, but when for experimenting this is fine, because the contents will also be kept, if you close the session.
 
-if you have not set your registry name in the steps earlier, please do so now:
+Since we switched to Bash, we need to set the variable again:
 
 ----
 REGISTRY_NAME=youruniquename
@@ -551,7 +555,7 @@ az acr repository list --name $REGISTRY_NAME --output table
 ----
 
 == Deploying a container
-We're going to deploy a container. Right now we will be taking a shortcut, by providing the admin credentials. Again, this is for testing purposes only. In a production environment it is recommended to diasble the admin account and only use role-based access with Azure Active Directory identities. That is for a future Azure thursday session.
+Next, we're going to deploy a container. Right now we will be taking a shortcut, by providing the admin credentials. Again, this is for testing purposes only. In a production environment it is recommended to diasble the admin account and only use role-based access with Azure Active Directory identities. That is for a future Azure thursday session.
 
 Execute the following commands
 ----
