@@ -86,7 +86,7 @@ Navigate to the resource group you made earlier (armResourceGroup). In the top-r
 
 image::../images/verifydeployment.png[]
 
-image::../images/verifydeployment2.png[]
+image::../images/verifydeployment2.PNG[]
 
 If you click on `blanktemplate` you'll see details about the deployment. This might be useful later on.
 
@@ -150,7 +150,7 @@ DeploymentDebugLogLevel :
 
 Also, if you want to check the deployment in the Azure Portal, you'll see that a storage account was created:
 
-image::../images/verifydeployment3.png[]
+image::../images/verifydeployment3.PNG[]
 
 === Parameters and outputs
 Now imagine we have an Azure environment with lots of resources and we need to be able to see instantly what the purpose of the storage account is, just by looking at its name. We could do this with a prefix. One way is to use the concat function and concatenate the name with the prefix specified in the template. This is exactly what we're going to do next, with one addition: we'll make a parameter for that, so we can reuse the template.
@@ -339,7 +339,7 @@ DeploymentDebugLogLevel :
 
 In the Azure portal, you could verify the deployment:
 
-image::../images/verifydeployment4.png[]
+image::../images/verifydeployment4.PNG[]
 
 By now, it should be possible now to connect to the VM using the credentials specified earlier to the template. In order to do that, you'll need to open a remote desktop connection to the hostname specified by the output of the last command. (in the example it is: mustbeuniquewutwut.westeurope.cloudapp.azure.com )
 
@@ -462,7 +462,7 @@ New-AzResourceGroupDeployment `
 In Azure Portal, navigate to your VM (SimpleWinVM) and verify that the tags are present. 
 Now click on one of the two tags. It should bring you to a list of all resources with that tag, which can be convenient.
 
-image::../images/verifydeployment5.png[]
+image::../images/verifydeployment5.PNG[]
 
 == Docker containers in Azure
 
@@ -470,7 +470,7 @@ image::../images/verifydeployment5.png[]
 We will be using the azure CLI for these steps.
 Go to the azure portal and click on the CLI button in the top right:
 
-image::../images/azure_cli.png[]
+image::../images/azure_cli.PNG[]
 
 Ensure that Powershell mode is selected and type the following command:
 
@@ -493,7 +493,7 @@ az acr replication create -r acrazthur -l eastasia
 
 When this is finished, visit the azure portal and navigate to container registries. Choose the registry you just created and click on 'Replications'. Verify that the replication is set up correctly:
 
-image::../images/acr_geo.png[]
+image::../images/acr_geo.PNG[]
 
 === Creating an image
 The following part borrowed from microsoft docs. We will create a very basic docker image. 
